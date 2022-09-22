@@ -1,3 +1,12 @@
+const dotenv = require('dotenv')
+const HDWalletProvider = require('@truffle/hdwallet-provider')
+
+dotenv.config()
+
+const privateKeys = [
+  process.env.METAMASK_PRIVATE_KEY,
+]
+
 /**
  * Use this file to configure your truffle project. It's seeded with some
  * common settings for different networks and features like migrations,
@@ -12,7 +21,7 @@
  * --------------------------------
  *
  * Do you have a complex application that requires lots of transactions to deploy?
- * Use this appproach to make deployment a breeze 🏖️:
+ * Use this approach to make deployment a breeze 🏖️:
  *
  * Infura deployment needs a wallet provider (like @truffle/hdwallet-provider)
  * to sign transactions before they're sent to a remote public node. 
@@ -82,13 +91,17 @@ module.exports = {
     //
     // Useful for deploying to a public network.
     // Note: It's important to wrap the provider as a function to ensure truffle uses a new provider every time.
-    // goerli: {
-    //   provider: () => new HDWalletProvider(MNEMONIC, `https://goerli.infura.io/v3/${PROJECT_ID}`),
-    //   network_id: 5,       // Goerli's id
-    //   confirmations: 2,    // # of confirmations to wait between deployments. (default: 0)
-    //   timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
-    //   skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
-    // },
+    rinkeby: {
+      provider: () => new HDWalletProvider({
+        privateKeys: privateKeys,
+        providerOrUrl: `https://rinkeby.infura.io/v3/${process.env.API_KEY_ENDPOINT}`,
+        numberOfAddresses: 1
+      }),
+      network_id: 4,       // Rinkeby's id
+      confirmations: 2,    // # of confirmations to wait between deployments. (default: 0)
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
+    },
     //
     // Useful for private networks
     // private: {
@@ -106,7 +119,7 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.8.17",      // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.8.11",      // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
       // settings: {          // See the solidity docs for advice about optimization and evmVersion
       //  optimizer: {

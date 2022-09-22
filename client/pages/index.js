@@ -3,7 +3,8 @@ import Image from 'next/image'
 import homeModule from '../styles/Home.module.css'
 import { GiImperialCrown } from 'react-icons/gi'
 import Web3 from 'web3'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import lotteryContract from '../blockchain/lottery.js'
 
 export default function Home() {
   const styles = {
@@ -23,10 +24,64 @@ export default function Home() {
     card: 'block p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 mb-5',
     card_H: 'mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white',
     card_P: 'font-normal text-gray-700 dark:text-gray-400 text-sm leading-5',
+    errorCover: '',
+    error: 'text-rose-400 text-bolder',
+    successMsgCover: '',
+    successMsg: 'text-emerald-400 text-bolder',
+    catIcon: 'text-xl',
   }
   const [ web3, setWeb3 ] = useState()
   const [ address, setAddress ] = useState()
+  const [ lcContract, setLcContract ] = useState()
+  const [ lotteryPot, setLotteryPot ] = useState()
+  const [ players, setPlayers ] = useState([])
+  const [ error, setError ] = useState('')
+  const [ successMsg, setSuccessMsg ] = useState('')
+
+  useEffect(() => {
+    /* benefit of writing as below is cleaner code 
+    & able to check parameters and flash errors if any */
+    if (lcContract) getPot()
+    if (lcContract) getPlayers()
+  }, [lcContract])
+/* the statements of below kind make infinite re-renders since 
+both lotteryPot and players are getting changed with the same event, 
+thus being called almost the same time
+  }, [lotteryPot, lcContract, players]) */
+  
+  const getPot = async () => {
+    const pot = await lcContract.methods.getBalance().call()
+    setLotteryPot(web3.utils.fromWei(pot, 'ether'))
+  }
+  const getPlayers = async() => {
+    const playersArr = await lcContract.methods.getPlayers().call()
+    setPlayers(playersArr)
+  }
+  const enterLottery = async () => {
+    try {
+      await lcContract.methods.enter().send({
+        from: address,
+        value: '15000000000000000',
+        gas: 300000,
+        gasPrice: null
+      })
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+  const pickWinner = async () => {
+    try {
+      await lcContract.methods.payWinner().send({
+        from: address,
+        gas: 300000,
+        gasPrice: null
+      })
+    } catch (err) {
+      setError(err.message)
+    }
+  }
   const connectWallet = async () => {
+    setError('')
     if (typeof window !== 'undefined' && typeof window.ethereum !== 'undefined') {
       try {
         /* connect wallet */
@@ -37,16 +92,19 @@ export default function Home() {
         /* inherit account */
         const accounts = await web3.eth.getAccounts()
         setAddress(accounts[0])
-        /* watch account change and connect */
+        /* watch for account change on wallet and connect */
         window.ethereum.on('accountsChanged', async () => {
           const accounts = await web3.eth.getAccounts()
           setAddress(accounts[0])
         })
+        /* initialize contract variable */
+        const lc= lotteryContract(web3)
+        setLcContract(lc)
       } catch (err) {
-        console.log(err.message)
+        setError(err.message)
       }
     } else {
-      console.log(`Please install Metamask ${'https://metamask.io/download/'}`)
+      err.message(`Please install Metamask ${'https://metamask.io/download/'}`)
     }
   }
   console.log(address)
@@ -66,17 +124,31 @@ export default function Home() {
               <div className={styles.lotteryInteract}>
                 <div className={styles.enterSection}>
                   <p className={styles.para}>Enter the lottery by sending 0.01 ether</p>
-                  <button type='button' className={styles.enterBtn}>
+                  <button type='button' onClick={enterLottery} className={styles.enterBtn}>
                     <svg className="w-4 h-4 mr-2 -ml-1 text-[#626890]" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="ethereum" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M311.9 260.8L160 353.6 8 260.8 160 0l151.9 260.8zM160 383.4L8 290.6 160 512l152-221.4-152 92.8z"></path></svg>
                     Pay with Ethereum</button>
                 </div>
                 <div className={styles.chooseSection}>
                   <p className={styles.para}><b>Admin only function:</b> drop a winner</p>
-                  <button className={styles.dropBtn}>
+                  <button onClick={pickWinner} className={styles.dropBtn}>
                     <span>Drop a Winner </span> <GiImperialCrown className='text-yellow-500 text-lg'/>
                     </button>
                 </div>
               </div>
+              {error && (
+                <div className={styles.errorCover}>
+                  <p className={styles.error}>
+                    <b>Error:</b> {error} <span className={styles.catIcon}>🙀
+                    </span></p>
+                </div>
+              )}
+              {successMsg && (
+                <div className={styles.successMsgCover}>
+                  <p className={styles.successMsg}>
+                    <b>Woah:</b> {successMsg} <span className={styles.catIcon}>😼
+                    </span></p>
+                </div>
+              )}
             </div>
           </div>
           <div className={styles.Pg_rgt}>
@@ -99,17 +171,19 @@ export default function Home() {
                   <p className={styles.card_P}>0xFC6E29BDF0A5fC0E263Aa0D0325DbE7A4a650ee8</p>
                 </div>
               </a>
-              <a href="#" className={styles.card}>
-                <h5 className={styles.card_H}>Players()</h5>
-                <p className={styles.card_P}>
-                  0x3A41745999ad4D2c4F62e006E744Dea5CFFc1415
-                  0xF3a3bAeaC912841D7DE6afED3292855C20dcab25
-                  0xFC6E29BDF0A5fC0E263Aa0D0325DbE7A4a650ee8
-                </p>
-              </a>
+              <div className={styles.card}>
+                <h5 className={styles.card_H}>Players ({players.length})</h5>
+                <ul className={styles.card_P}>
+                  {players.map((player, i) => (
+                    <li key={i}>
+                      <a href={`https://rinkeby.etherscan.io/tx/${player}`}>{player}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
               <a href="#" className={styles.card}>
                 <h5 className={styles.card_H}>POT</h5>
-                <p className={styles.card_P}>10 Ether</p>
+                <p className={styles.card_P}>{lotteryPot} Ether</p>
               </a>
             </div>
           </div>
