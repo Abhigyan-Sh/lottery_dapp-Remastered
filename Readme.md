@@ -1,56 +1,64 @@
+# project eaGle nest : smartContract Lottery
+
+## what it has ?
+- Chainlink VRF
+- Robust UI
+- really a Seamless experience for users
+- verifiablity of each steps
+
 ### steps initiated:
 - wrote Lottery.sol
 - downloading dependency for chainlink contract, npm i @chainlink/contracts --save
 - creating `.env` and setting up configuration (through truffle-config.js)
-- - for accessing account setting up private keys and properties of the network to which to deploy.
+- for accessing account setting up private keys and properties of the network to which to deploy all like did in brownie.
 - now create file in migrations - '2_deploy_contracts.js'.
-- 
 
-> [lottery address](`https://rinkeby.etherscan.io/tx/${0x894adcB4f81fF1FaBAbFa926d98C44B235dFAEc3}`)
-
+> ### [lottery address](`https://rinkeby.etherscan.io/tx/${0x0x5be55a3f443A068d615fB59593d6E4E1e6DC7454}`) (not verified though)
 
 Starting migrations...
 ======================
 > Network name:    'rinkeby'
 > Network id:      4
-> Block gas limit: 29999972 (0x1c9c364)
-
-
+> Block gas limit: 30000000 (0x1c9c380)
 2_deploy_contracts.js
-=====================
 
-   Deploying 'Lottery'
+
+
+   Replacing 'Lottery'
    -------------------
-   > transaction hash:    0x3f84ec86b871a5b75298dc810347eef283cb951c67d85934784cd83d0905f455
-   > Blocks: 1            Seconds: 14
-   > contract address:    0x894adcB4f81fF1FaBAbFa926d98C44B235dFAEc3
-   > block number:        11425060
-   > block timestamp:     1663854791
-   > account:             0x3A41745999ad4D2c4F62e006E744Dea5CFFc1415
-   > balance:             4.345631139435489559
-   > gas used:            1169760 (0x11d960)
-   > gas price:           2.500000008 gwei
-   > value sent:          0 ETH
-   > total cost:          0.00292440000935808 ETH
+   > transaction hash:    0xec68aa0bf37e238dd5c855f64dee64e33f1652746b189bd82766334c11d62493\
+   > Blocks: 2            Seconds: 21\
+   > contract address:    0x5be55a3f443A068d615fB59593d6E4E1e6DC7454\
+   > block number:        block no.\
+   > block timestamp:     block timestamp\
+   > account:             MY ACCOUNT ADDRESS\
+   > balance:             MY ACCOUNT BALANCE\
+   > gas used:            1213798 (0x128566)\
+   > gas price:           2.500000008 gwei\
+   > value sent:          0 ETH\
+   > total cost:          0.003034495009710384 ETH\
 
    Pausing for 2 confirmations...
 
    -------------------------------
-   > confirmation number: 1 (block: 11425061)
-   > confirmation number: 2 (block: 11425062)
+   > confirmation number: 1 (block: 11435563)
+   > confirmation number: 2 (block: 11435564)
    > Saving artifacts
    -------------------------------------
-   > Total cost:     0.00292440000935808 ETH
+   > Total cost:     0.003034495009710384 ETH
 
 Summary
 =======
 > Total deployments:   1
-> Final cost:          0.00292440000935808 ETH
+> Final cost:          0.003034495009710384 ETH
 
 
 ### Go back to client
-- now to glue userInterface with blockchain, we need `contract_abi` alongwith its `address`
+- now to glue userInterface with blockchain, we need `contract_abi` alongwith its `address` as you know already.
 - since multiple contracts are involved here and no one knows why but I want to get abi for dependency contracts even. So, installing.. solc: ^0.8.11
-(simply you may edit the package.json and hit npm i, so to avoid any possible version mismatch)
-- so to use solc lib. you need to hit command so just edit scripts(package.json) and hit command but since you don't have @chainlink/contracts dependencies installed, install them first.
-- So the `folder` I created named `blockchain` in client dir, was having build(to which contract abi's got saved), contracts(having our sole contract), lottery.js(js script to be written for exporting out direct the contract itself), out of which 2 got filled now write lottery.js
+(simply you may edit the package.json and hit npm i, so to avoid any possible version mismatch).
+`Later found to be having some discrepancies in abi from deploy and from solc but only solc one was working.`
+- So to use `solc lib.` you need to hit command so just edit scripts (`package.json`) and hit command but since you don't have `@chainlink/contracts` dependencies installed, install them first.
+
+> truffle migrate --network rinkeby\
+> npm run compile

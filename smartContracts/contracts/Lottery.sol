@@ -33,7 +33,6 @@ contract Lottery is VRFConsumerBase {
 
     function fulfillRandomness(bytes32 requestId, uint randomness) internal override {
         randomResult = randomness;
-        payWinner();
     }
 
     function getWinnerByLottery(uint lottery) public view returns (address payable) {
@@ -60,6 +59,7 @@ contract Lottery is VRFConsumerBase {
     }
 
     function payWinner() public {
+        require(randomResult > 0, "source of randomness is not present!");
         uint index = randomResult % players.length;
         players[index].transfer(address(this).balance);
 
@@ -76,4 +76,6 @@ contract Lottery is VRFConsumerBase {
     }
 }
 /* contract address: 
-0x894adcB4f81fF1FaBAbFa926d98C44B235dFAEc3 */
+0x894adcB4f81fF1FaBAbFa926d98C44B235dFAEc3, older version
+0x5be55a3f443A068d615fB59593d6E4E1e6DC7454, latest version
+ */

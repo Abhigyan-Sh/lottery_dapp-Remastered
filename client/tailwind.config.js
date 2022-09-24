@@ -6,6 +6,10 @@ module.exports = {
   ],
   theme: {
     extend: {},
+    screens: {
+      'tablet': {'max': '1024px'},
+      'cstm_540': {'max': '540px'}
+    },
   },
   plugins: [],
 }
