@@ -237,6 +237,7 @@ thus being called almost the same time
                       <a 
                         href={`https://rinkeby.etherscan.io/address/${lotteryInstant.address}`} 
                         target='_blank'
+                        rel="noreferrer"
                         className={styles.card_P}>
                         {lotteryInstant.address}</a>
                     </div>
@@ -247,7 +248,9 @@ thus being called almost the same time
                 <ul className={styles.card_P}>
                   {players.map((player, i) => (
                     <li key={i}>
-                      <a href={`https://rinkeby.etherscan.io/address/${player}`} target='_blank'>
+                      <a href={`https://rinkeby.etherscan.io/address/${player}`} 
+                      target='_blank'
+                      rel="noreferrer">
                         {player}</a>
                     </li>
                   ))}
@@ -256,7 +259,8 @@ thus being called almost the same time
               <div className={styles.card}>
                 <a 
                   href="https://rinkeby.etherscan.io/address/0x5be55a3f443A068d615fB59593d6E4E1e6DC7454"
-                  target='_blank'>
+                  target='_blank'
+                  rel="noreferrer">
                     <h5 className={styles.card_H}>POT</h5>
                     <p className={styles.card_P}>{lotteryPot} Ether</p>
                 </a>
